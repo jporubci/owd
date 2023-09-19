@@ -33,7 +33,7 @@ OnWeb Diagnostic is a web tool that integrates with OBD-II scan tools to monitor
 ### Advanced Functions
 
 - Real-time updates on estimated MPG, engine load, coolant temperature, speed, and RPM.
-- Comprehensive vehicle diagnostic analysis
+- Comprehensive vehicle diagnostic analysis.
 
 ## Tech Stack
 
