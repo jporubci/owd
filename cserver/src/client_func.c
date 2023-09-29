@@ -1,6 +1,3 @@
-#ifndef CLIENT_H
-#define CLIENT_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +5,8 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
+
+#include "../include/client_func.h"
 
 void usage(int status) {
     fprintf(stderr, "Usage: ./client [OPTION] HOST PORT\n");
@@ -66,5 +65,3 @@ FILE* socket_dial(const char* hostname, const char* port) {
     
     return server_fp;
 }
-
-#endif

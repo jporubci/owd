@@ -1,14 +1,28 @@
-CC := gcc
-CFLAGS := -Wall
-INC := include
+EXE := server client
+FUN := _func
+
+BIN := bin
 SRC := src
-EXE := bin
-TARGETS := server client
+OBJ := obj
+INC := include
 
-all: $(TARGETS)
+all: $(addprefix $(BIN)/, $(EXE))
 
-%: $(SRC)/%.c $(INC)/%.h
-	$(CC) $(CFLAGS) -o $(EXE)/$@ $^
+# Initialize directories
+init:
+	@echo "Creating directories..."
+	@mkdir -p $(BIN) $(SRC) $(OBJ) $(INC)
 
+# Build executables
+$(BIN)/%: $(SRC)/%.c $(OBJ)/%$(FUN).o
+	@echo "Building $@..."
+	@gcc -Wall -o $@ $^
+
+# Build object files
+$(OBJ)/%.o: $(SRC)/%.c $(INC)/%.h
+	@gcc -Wall -c -o $@ $<
+
+# Delete executables and object files
 clean:
-	rm -f $(foreach target,$(TARGETS),$(addprefix $(EXE)/,$(target)))
+	@echo "Cleaning..."
+	@rm -f $(BIN)/* $(OBJ)/*.o

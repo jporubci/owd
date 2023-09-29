@@ -1,6 +1,8 @@
 /* client.c
  * Jozef Porubcin */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -8,7 +10,8 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
-#include "../include/client.h"
+
+#include "../include/client_func.h"
 
 int main(int argc, char* argv[]) {
     

@@ -1,6 +1,3 @@
-#ifndef SERVER_H
-#define SERVER_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -12,7 +9,7 @@
 #include <netdb.h>
 #include <errno.h>
 
-#define TEMPLATES_DIR "templates"
+#include "../include/server_func.h"
 
 void usage(int status) {
     fprintf(stderr, "Usage: ./server [OPTION] PORT\n");
@@ -173,5 +170,3 @@ void handle_request(FILE* client_fp) {
         return;
     }
 }
-        
-#endif
