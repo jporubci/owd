@@ -13,14 +13,14 @@
 
 #include "../include/client_func.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     
     /* Variables */
-    char* hostname = NULL;
-    char* port = NULL;
+    char *hostname = NULL;
+    char *port = NULL;
     
     /* Parse command line arguments */
-    for (int i = 1; i < argc && i > 0; ++i) {
+    for (int i = 1; i < argc && i > 0; i++) {
         
         /* --help */
         if (!strcmp(argv[i], "--help")) {
@@ -43,14 +43,14 @@ int main(int argc, char* argv[]) {
         usage(EXIT_FAILURE);
     }
     
-    FILE* server_fp = socket_dial(hostname, port);
+    FILE *server_fp = socket_dial(hostname, port);
     
     if (!server_fp) {
         return EXIT_FAILURE;
     }
     
     /* Send HTTP request */
-    fprintf(server_fp, "GET /index HTTP/1.1\r\n");
+    fprintf(server_fp, "POST /index HTTP/1.1\r\n");
     fprintf(server_fp, "\r\n");
     
     /* Read HTTP response */
@@ -62,5 +62,5 @@ int main(int argc, char* argv[]) {
     /* close */
     fclose(server_fp);
     
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -1,8 +1,8 @@
 #ifndef CLIENT_FUNC_H
 #define CLIENT_FUNC_H
 
-void usage(int status);
+void usage(int);
 
-FILE* socket_dial(const char* hostname, const char* port);
+FILE * socket_dial(const char *, const char *);
 
 #endif

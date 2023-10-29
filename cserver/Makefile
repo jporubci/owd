@@ -2,8 +2,8 @@ EXE := server client
 FUN := _func
 
 BIN := bin
-SRC := src
 OBJ := obj
+SRC := src
 INC := include
 
 all: $(addprefix $(BIN)/, $(EXE))
@@ -11,16 +11,16 @@ all: $(addprefix $(BIN)/, $(EXE))
 # Initialize directories
 init:
 	@echo "Creating directories..."
-	@mkdir -p $(BIN) $(SRC) $(OBJ) $(INC)
+	@mkdir -p $(BIN) $(OBJ) $(SRC) $(INC)
 
 # Build executables
 $(BIN)/%: $(SRC)/%.c $(OBJ)/%$(FUN).o
 	@echo "Building $@..."
-	@gcc -Wall -o $@ $^
+	@gcc -Wall -o $@ $^ -lmysqlclient
 
 # Build object files
 $(OBJ)/%.o: $(SRC)/%.c $(INC)/%.h
-	@gcc -Wall -c -o $@ $<
+	@gcc -Wall -o $@ $< -c
 
 # Delete executables and object files
 clean:

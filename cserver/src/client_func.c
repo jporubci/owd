@@ -16,10 +16,10 @@ void usage(int status) {
     exit(status);
 }
 
-FILE* socket_dial(const char* hostname, const char* port) {
+FILE * socket_dial(const char *hostname, const char *port) {
     
     /* getaddrinfo */
-    struct addrinfo* results;
+    struct addrinfo *results;
     struct addrinfo hints = {
         .ai_family      = AF_UNSPEC,    /* Return IPv4 and IPv6 choices */
         .ai_socktype    = SOCK_STREAM,  /* Use TCP */
@@ -35,7 +35,7 @@ FILE* socket_dial(const char* hostname, const char* port) {
     
     /* For each server entry, allocate socket and try to connect */
     int server_socket_fd = -1;
-    for (struct addrinfo* p = results; p && server_socket_fd == -1; p = p->ai_next) {
+    for (struct addrinfo *p = results; p && server_socket_fd == -1; p = p->ai_next) {
         /* socket */
         if ((server_socket_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
             fprintf(stderr, "socket failed: %s\n", strerror(errno));
@@ -56,7 +56,7 @@ FILE* socket_dial(const char* hostname, const char* port) {
         return NULL;
     }
     
-    FILE* server_fp = fdopen(server_socket_fd, "w+");
+    FILE *server_fp = fdopen(server_socket_fd, "w+");
     if (!server_fp) {
         fprintf(stderr, "fdopen failed: %s\n", strerror(errno));
         close(server_socket_fd);

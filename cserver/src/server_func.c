@@ -20,7 +20,7 @@ void usage(int status) {
 }
 
 /* Get server socket file descriptor from port */
-int socket_listen(const char* port) {
+int socket_listen(const char *port) {
     
     /* getaddrinfo */
     struct addrinfo hints = {
@@ -29,7 +29,7 @@ int socket_listen(const char* port) {
         .ai_protocol    = 0,            /* Use socket addresses with any protocol */
         .ai_flags       = AI_PASSIVE,   /* Use all interfaces to listen */
     };
-    struct addrinfo* results;
+    struct addrinfo *results;
     int gai_status;
     if ((gai_status = getaddrinfo(NULL, port, &hints, &results)) != 0) {
         fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(gai_status));
@@ -38,7 +38,7 @@ int socket_listen(const char* port) {
     
     /* For each address entry, allocate socket, bind, and listen */
     int server_socket_fd = -1;
-    for (struct addrinfo* p = results; p && server_socket_fd == -1; p = p->ai_next) {
+    for (struct addrinfo *p = results; p && server_socket_fd == -1; p = p->ai_next) {
         /* socket */
         if ((server_socket_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1) {
             fprintf(stderr, "socket failed: %s\n", strerror(errno));
@@ -66,8 +66,8 @@ int socket_listen(const char* port) {
     return server_socket_fd;
 }
 
-/* Get FILE* for client */
-FILE* accept_client(int server_socket_fd) {
+/* Get FILE * for client */
+FILE * accept_client(int server_socket_fd) {
     
     /* accept */
     struct sockaddr client_addr;
@@ -79,7 +79,7 @@ FILE* accept_client(int server_socket_fd) {
     }
     
     /* fdopen */
-    FILE* client_fp;
+    FILE *client_fp;
     if (!(client_fp = fdopen(client_socket_fd, "w+"))) {
         fprintf(stderr, "fdopen failed: %s\n", strerror(errno));
         close(client_socket_fd);
@@ -90,9 +90,9 @@ FILE* accept_client(int server_socket_fd) {
 }
 
 /* Handle client request */
-void handle_request(FILE* client_fp) {
+void handle_request(FILE *client_fp, MYSQL *mysql) {
     
-    char* WHITESPACE = " \t\r\n";
+    char *WHITESPACE = " \t\r\n";
     
     /* Parse URI */
     char request_buffer[BUFSIZ];
@@ -103,16 +103,113 @@ void handle_request(FILE* client_fp) {
     
     fprintf(stderr, "%s", request_buffer);
     
-    char* method = strtok(request_buffer, WHITESPACE);
-    char* path = strtok(NULL, WHITESPACE);
-    char* http_version = strtok(NULL, WHITESPACE);
+    char *method = strtok(request_buffer, WHITESPACE);
+    char *path = strtok(NULL, WHITESPACE);
+    char *http_version = strtok(NULL, WHITESPACE);
     
     /* Skip headers */
     char header_buffer[BUFSIZ];
-    while (fgets(header_buffer, sizeof(header_buffer), client_fp) && strlen(header_buffer) > 2);
+    size_t content_length = 0;
+    while (fgets(header_buffer, sizeof(header_buffer), client_fp) && strlen(header_buffer) > 2) {
+        
+        char *header = strtok(header_buffer, " \r\n");
+        if (!strcmp(header, "Content-Length:")) {
+            content_length = strtoull(strtok(NULL, " \r\n"), NULL, 0);
+        }
+    }
     
     /* Return message */
-    if (!strcmp(method, "GET")) {
+    if (!strcmp(method, "POST") || !strcmp(method, "GET")) {
+        
+        if (!strcmp(method, "POST")) {
+            /* Log in */
+            if (!strcmp(path, "/login")) {
+                
+                char login_body[530];
+                fread(login_body, 1, content_length, client_fp);
+                char *username = strtok(login_body, "=& ");
+                username = strtok(NULL, "=& ");
+                char *password = strtok(NULL, "=& ");
+                password = strtok(NULL, "=& ");
+                
+                const char *req = "SELECT username, password FROM Users WHERE username='";
+                char login_lookup_buffer[strlen(req)+255+16+255+1+1];
+                sprintf(login_lookup_buffer, "%s%s' AND password='%s'", req, username, password);
+                
+                if (mysql_query(mysql, login_lookup_buffer)) {
+                    fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
+                    return;
+                }
+                
+                MYSQL_RES *response = mysql_store_result(mysql);
+                MYSQL_ROW row = mysql_fetch_row(response);
+                
+                /* Username already exists */
+                if (row) {
+                    mysql_free_result(response);
+                    
+                    printf("Access granted.\n");
+                
+                } else {
+                    mysql_free_result(response);
+                    
+                    printf("Invalid username or password.\n");
+                }
+            
+            /* Register user */
+            } else if (!strcmp(path, "/register")) {
+                
+                char register_body[791];
+                fread(register_body, 1, content_length, client_fp);
+                char *username = strtok(register_body, "=& ");
+                username = strtok(NULL, "=& ");
+                char *password = strtok(NULL, "=& ");
+                password = strtok(NULL, "=& ");
+                char *name = strtok(NULL, "=& ");
+                name = strtok(NULL, "=& ");
+                
+                const char *req = "SELECT username FROM Users WHERE username='";
+                char register_lookup_buffer[strlen(req)+255+1+1];
+                sprintf(register_lookup_buffer, "%s%s'", req, username);
+                
+                if (mysql_query(mysql, register_lookup_buffer)) {
+                    fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
+                    return;
+                }
+                
+                MYSQL_RES *response = mysql_store_result(mysql);
+                MYSQL_ROW row = mysql_fetch_row(response);
+                
+                /* Username already exists */
+                if (row) {
+                    mysql_free_result(response);
+                    printf("User already exists with username.\n");
+                
+                } else {
+                    mysql_free_result(response);
+                    
+                    /* Register user */
+                    const char *req = "INSERT INTO Users (username, password, name) VALUES ('";
+                    char register_insert_buffer[strlen(req)+255+4+255+4+255+2+1];
+                    sprintf(register_insert_buffer, "%s%s', '%s', '%s')", req, username, password, name);
+                    if (mysql_query(mysql, register_insert_buffer)) {
+                        fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
+                        return;
+                    }
+                    
+                    printf("User registered.\n");
+                }
+            
+            } else if (!strcmp(path, "/car")) {
+                if (mysql_query(mysql, "INSERT INTO Cars VALUES ('jporubci', '4Y1SL65848Z411439', 'Southern Sales', 'dst6-14', '2008')")) {
+                    fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
+                    return;
+                }
+            
+            } else if (!strcmp(path, "/trip")) {
+                
+            }
+        }
         
         char template_buffer[BUFSIZ];
         strncpy(template_buffer, TEMPLATES_DIR, sizeof(TEMPLATES_DIR)+1);
@@ -138,7 +235,7 @@ void handle_request(FILE* client_fp) {
         }
         
         /* malloc */
-        void* data = malloc(sb.st_size);
+        void *data = malloc(sb.st_size);
         if (data == NULL) {
             fprintf(stderr, "malloc failed\n");
             fprintf(client_fp, "%s 500 Internal Server Error\r\n", http_version);
