@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Project Information</title>
+</head>
+
+<body>
+    <h1>Relational Schema</h1>
+    <table border="1">
+        <tr>
+            <th>Table</th>
+            <th>Attributes</th>
+            <th>Functional Dependencies</th>
+        </tr>
+        <tr>
+            <td>Car</td>
+            <td>make, model, year, vin</td>
+            <td>vin -> make, model, year</td>
+        </tr>
+        <tr>
+            <td>User</td>
+            <td>name, user_name, password</td>
+            <td>user_name -> name, password</td>
+        </tr>
+        <tr>
+            <td>Trips</td>
+            <td>vin, start_time, finish_time</td>
+            <td>vin, start_time, finish_time</td>
+        </tr>
+        <tr>
+            <td>Trip_Data</td>
+            <td>time, rpm, speed, engineload, coolant_temp</td>
+            <td>time -> rpm, speed, engineload, coolant_temp</td>
+        </tr>
+    </table>
+
+    <h1>Database and Software Languages</h1>
+    <p>Database: mySQL</p>
+    <p>Backend: C</p>
+    <p>Frontend: HTML, Javascript</p>
+
+    <h1>Data</h1>
+    <p>Obtained from the OBD-II tool, which will gather information on Chris’ car as it makes trips</p>
+
+    <h1>Labor Division</h1>
+    <ul>
+        <li>Brian: Database Designer</li>
+        <li>Minsub: Frontend Engineer</li>
+        <li>Jozef: Backend Engineer</li>
+        <li>Chris: Frontend and Backend Engineer</li>
+    </ul>
+
+    <h1>Timeline</h1>
+    <ul>
+        <li>Sep. 29 - Stage 2</li>
+        <li>Oct. 6 - Design database</li>
+        <li>Oct. 13 - Gather data</li>
+        <li>Oct. 20 - Clean and place data into database, begin frontend and backend operations</li>
+        <li>Oct. 27 - Finish up stage 3 demo</li>
+        <li>Nov. 1 - Stage 3: Initial Demo</li>
+        <li>Nov. 3 - Implement advanced functions (Real-time uploading)</li>
+        <li>Nov. 10 - Implement advanced function (Comprehensive Vehicle Diagnostic Analysis)</li>
+        <li>Nov. 17 - Finish front end and back end operations</li>
+        <li>Nov. 24 - Testing phase</li>
+        <li>Dec. 1 - Fix final bugs and issues</li>
+        <li>Dec. 8 - Prepare for Stage 4, Presentation and Youtube Link</li>
+        <li>Dec. X - Stage 4: Final Demo and Report</li>
+    </ul>
+</body>
+
+</html>
+

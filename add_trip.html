@@ -6,18 +6,21 @@
     <title>Car Statistics Monitoring System</title>
 </head>
 <body>
-    <h1>Register</h1>
-    <form method='post' action='/register'>
+    <h1>Add trip</h1>
+    <form method='post' action='/cse30246/owd/upload_trip.php' enctype='multipart/form-data'>
         <label for='username'>Username:</label>
         <input type='text' id='username' name='username' required maxlength='255'/>
         <br/><br/>
         <label for='password'>Password:</label>
         <input type='password' id='password' name='password' required minlength='8' maxlength='255'/>
         <br/><br/>
-        <label for='name'>Name:</label>
-        <input type='text' id='name' name='name' required maxlength='255'/>
+        <label for='VIN'>VIN:</label>
+        <input type='text' id='VIN' name='VIN' required minlength='17' maxlength='17'/>
         <br/><br/>
-        <input type='submit' value='Register'/>
+        <label for='file'>File:</label>
+        <input type='file' id='file' name='file' accept='text/csv'/>
+        <br/><br/>
+        <input type='submit' value='Upload trip'/>
     </form>
 </body>
 </html>

@@ -106,6 +106,7 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
     char *method = strtok(request_buffer, WHITESPACE);
     char *path = strtok(NULL, WHITESPACE);
     char *http_version = strtok(NULL, WHITESPACE);
+    char *ext = ".html";
     
     /* Skip headers */
     char header_buffer[BUFSIZ];
@@ -125,18 +126,18 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
             /* Log in */
             if (!strcmp(path, "/login")) {
                 
-                char login_body[530];
-                fread(login_body, 1, content_length, client_fp);
-                char *username = strtok(login_body, "=& ");
-                username = strtok(NULL, "=& ");
-                char *password = strtok(NULL, "=& ");
-                password = strtok(NULL, "=& ");
+                char body[BUFSIZ];
+                fread(body, 1, content_length, client_fp);
+                char *username = strtok(body, "=&");
+                username = strtok(NULL, "=&");
+                char *password = strtok(NULL, "=&");
+                password = strtok(NULL, "=&");
                 
                 const char *req = "SELECT username, password FROM Users WHERE username='";
-                char login_lookup_buffer[strlen(req)+255+16+255+1+1];
-                sprintf(login_lookup_buffer, "%s%s' AND password='%s'", req, username, password);
+                char buffer[BUFSIZ];
+                sprintf(buffer, "%s%s' AND password='%s'", req, username, password);
                 
-                if (mysql_query(mysql, login_lookup_buffer)) {
+                if (mysql_query(mysql, buffer)) {
                     fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
                     return;
                 }
@@ -159,20 +160,20 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
             /* Register user */
             } else if (!strcmp(path, "/register")) {
                 
-                char register_body[791];
-                fread(register_body, 1, content_length, client_fp);
-                char *username = strtok(register_body, "=& ");
-                username = strtok(NULL, "=& ");
-                char *password = strtok(NULL, "=& ");
-                password = strtok(NULL, "=& ");
-                char *name = strtok(NULL, "=& ");
-                name = strtok(NULL, "=& ");
+                char body[BUFSIZ];
+                fread(body, 1, content_length, client_fp);
+                char *username = strtok(body, "=&");
+                username = strtok(NULL, "=&");
+                char *password = strtok(NULL, "=&");
+                password = strtok(NULL, "=&");
+                char *name = strtok(NULL, "=&");
+                name = strtok(NULL, "=&");
                 
                 const char *req = "SELECT username FROM Users WHERE username='";
-                char register_lookup_buffer[strlen(req)+255+1+1];
-                sprintf(register_lookup_buffer, "%s%s'", req, username);
+                char buffer[BUFSIZ];
+                sprintf(buffer, "%s%s'", req, username);
                 
-                if (mysql_query(mysql, register_lookup_buffer)) {
+                if (mysql_query(mysql, buffer)) {
                     fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
                     return;
                 }
@@ -190,9 +191,8 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
                     
                     /* Register user */
                     const char *req = "INSERT INTO Users (username, password, name) VALUES ('";
-                    char register_insert_buffer[strlen(req)+255+4+255+4+255+2+1];
-                    sprintf(register_insert_buffer, "%s%s', '%s', '%s')", req, username, password, name);
-                    if (mysql_query(mysql, register_insert_buffer)) {
+                    sprintf(buffer, "%s%s', '%s', '%s')", req, username, password, name);
+                    if (mysql_query(mysql, buffer)) {
                         fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
                         return;
                     }
@@ -200,21 +200,18 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
                     printf("User registered.\n");
                 }
             
-            } else if (!strcmp(path, "/car")) {
-                if (mysql_query(mysql, "INSERT INTO Cars VALUES ('jporubci', '4Y1SL65848Z411439', 'Southern Sales', 'dst6-14', '2008')")) {
-                    fprintf(stderr, "mysql_query failed: %s", mysql_error(mysql));
-                    return;
-                }
-            
-            } else if (!strcmp(path, "/trip")) {
+            } else if (!strcmp(path, "/upload_car")) {
+                ext = ".php";
                 
+            } else if (!strcmp(path, "/upload_trip")) {
+                ext = ".php";
             }
         }
         
         char template_buffer[BUFSIZ];
         strncpy(template_buffer, TEMPLATES_DIR, sizeof(TEMPLATES_DIR)+1);
-        strncat(template_buffer, path, BUFSIZ - sizeof(TEMPLATES_DIR)-1);
-        strncat(template_buffer, ".html", BUFSIZ - sizeof(TEMPLATES_DIR)-1 - 5);
+        strncat(template_buffer, path, BUFSIZ - (sizeof(TEMPLATES_DIR)+1));
+        strncat(template_buffer, ext, BUFSIZ - ((sizeof(TEMPLATES_DIR)+1) + 5));
         
         /* stat */
         struct stat sb;
@@ -257,10 +254,16 @@ void handle_request(FILE *client_fp, MYSQL *mysql) {
         
         /* Respond to client */
         fprintf(client_fp, "%s 200 OK\r\n", http_version);
-        fprintf(client_fp, "Content-Type: text/html\n");
+        fprintf(client_fp, "Content-Type: text/html\r\n");
         fprintf(client_fp, "Content-Length: %ld\r\n", sb.st_size);
         fprintf(client_fp, "\r\n");
         fwrite(data, 1, sb.st_size, client_fp);
+        
+        fprintf(stderr, "%s 200 OK\r\n", http_version);
+        fprintf(stderr, "Content-Type: text/html\r\n");
+        fprintf(stderr, "Content-Length: %ld\r\n", sb.st_size);
+        fprintf(stderr, "\r\n");
+        fwrite(data, 1, sb.st_size, stderr);
         
         free(data);
         close(fd);
