@@ -4,47 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Statistics Monitoring System</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-	<h1>OBD-II diagnostic web tool- OnWeb Diagnostic (OWD) </h1>
-	<h2>Description</h2>
-    <p>We wish to measure car statistics such as engine load, coolant temperature, speed, and RPM and store them in an online database.</p>
-    
-    <h2>Usefulness</h2>
-    <p>Monitor car health both with real-time updates and post-data analysis (i.e., read codes and produce the most likely cause, tracking trends over time, per user profile).</p>
-    
-    <h2>Realness</h2>
-    <p>The data would be real-time car information obtained from the OBD-II tool.</p>
-
-    <h2>Functionality</h2>
-    <p>Each user would have their own username and password, and a user_id will be assigned as the primary key.</p>
-
-    <h4>Basic Functions:</h4>
-    <ul>
+  <div class="header">
+	  <h1>OBD-II diagnostic web tool- OnWeb Diagnostic (OWD) </h1>
+  </div>
+  <div class="grid">
+    <div class="textbox">
+	    <h2>Description</h2>
+      <p>We wish to measure car statistics such as engine load, coolant temperature, speed, and RPM and store them in an online database.</p>
+    </div>
+    <div class="textbox">
+      <h2>Usefulness</h2>
+      <p>Monitor car health both with real-time updates and post-data analysis (i.e., read codes and produce the most likely cause, tracking trends over time, per user profile).</p>
+    </div>
+    <div class="textbox">
+      <h2>Realness</h2>
+      <p>The data would be real-time car information obtained from the OBD-II tool.</p>
+    </div>
+    <div class="textbox">
+      <h2>Functionality</h2>
+      <p>Each user would have their own username and password, and a user_id will be assigned as the primary key.</p>
+    </div>
+  </div>
+    <div class="textbox">
+    <h2>Basic Functions:</h2>
+    <ul class="custom-type">
         <li>A way for Users to login to their generated profile or create a new profile.</li>
         <li>Users have the following privileges:
-            <ul>
+            <ul class="custom-type">
                 <li>Upload own data</li>
                 <li>View own data</li>
                 <li>Delete own data</li>
             </ul>
         </li>
         <li>Admins have the following privileges:
-            <ul>
+            <ul class="custom-type">
                 <li>Delete users</li>
             </ul>
         </li>
     </ul>
 
-    <h4>Advanced Functions:</h4>
-    <ul>
+    
+    <h2>Advanced Functions:</h4>
+    <ul class="custom-type">
         <li>Real-time uploading on estimated MPG: engine load, coolant temperature, speed, RPM.</li>
         <li>Comprehensive Vehicle Diagnostic Analysis</li>
     </ul>
     <h2>ER Diagram</h2>
-    <p>For an Entity-Relationship (ER) Diagram, please visit <a href="https://drive.google.com/file/d/1s4p-seLu2D1phsTyP9WYEsJyZSekoZcx/view?usp=sharing" target="_blank">ER Diagram</a>.</p>
+    <p>For an Entity-Relationship (ER) Diagram, please visit <a href="https://drive.google.com/file/d/1s4p-seLu2D1phsTyP9WYEsJyZSekoZcx/view?usp=sharing" target="_blank">ER Diagram</a>. (link broken)</p>
     <h2> Development Plan </h2>
     <p> For an Development Plan, please visit <a href="http://db8.cse.nd.edu/cse30246/owd/devplan.html" target="_blank">Dev Plan</a>.</p>
+    </div>
 </body>
 </html>
 

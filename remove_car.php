@@ -2,12 +2,8 @@
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-if (isset($_SESSION['username'])) {
-    header('Location: home.php');
-}
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit('Invalid request method.');
+if (!isset($_SESSION['username'])) {
+    header('Location: logout_user.php');
 }
 
 /* Connect to MySQL DB */
@@ -33,38 +29,21 @@ if (!$dbh) {
     exit('Failed to connect to database.');
 }
 
-/* Validate user */
-$username = $_POST['username'];
-$password = $_POST['password'];
-$name = $_POST['name'];
-
-/* Try to look up user */
+/* Try to remove trip */
 try {
+    $VIN = $_POST['VIN'];
+    
     /* Begin transaction */
-    $a = false;
-    foreach ($dbh->query('SELECT username FROM Users WHERE username=\'' . $username . '\'') as $row) {
-        $a = true;
-    }
-    
-    if ($a) {
-        exit('User already exists.');
-    }
-    
-} catch (Exception $e) {
-    exit('Failed to log in: ' . $e->getMessage());
-}
-
-/* Try to upload car */
-try {
-    $dbh->exec('INSERT INTO Users (username, password, name) VALUES (\'' . $username . '\', \'' . $password . '\', \'' . $name . '\')');
+    $dbh->beginTransaction();
+    $dbh->exec('DELETE Trip_Data FROM Trip_Data INNER JOIN Trips ON Trip_Data.trip_id=Trips.trip_id WHERE Trips.VIN=' . $VIN);
+    $dbh->exec('DELETE FROM Trips WHERE VIN=' . $VIN);
+    $dbh->exec('DELETE FROM Cars WHERE VIN=' . $VIN);
+    $dbh->commit();
 
 } catch (Exception $e) {
-    exit('Failed to add car: ' . $e->getMessage());
+    $dbh->rollBack();
+    exit('Failed to delete trip: ' . $e->getMessage());
 }
-
-$_SESSION['name'] = $name;
-$_SESSION['password'] = $password;
-$_SESSION['username'] = $username;
 
 header('Location: home.php');
 

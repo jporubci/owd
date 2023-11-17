@@ -36,32 +36,24 @@ if (!$dbh) {
 /* Validate user */
 $username = $_POST['username'];
 $password = $_POST['password'];
-$name = $_POST['name'];
 
 /* Try to look up user */
 try {
     /* Begin transaction */
     $a = false;
-    foreach ($dbh->query('SELECT username FROM Users WHERE username=\'' . $username . '\'') as $row) {
+    foreach ($dbh->query('SELECT username FROM Users WHERE username=\'' . $username . '\' AND password=\'' . $password . '\'') as $row) {
         $a = true;
     }
     
-    if ($a) {
-        exit('User already exists.');
+    if (!$a) {
+        exit('Invalid username and password combination.');
     }
     
 } catch (Exception $e) {
     exit('Failed to log in: ' . $e->getMessage());
 }
 
-/* Try to upload car */
-try {
-    $dbh->exec('INSERT INTO Users (username, password, name) VALUES (\'' . $username . '\', \'' . $password . '\', \'' . $name . '\')');
-
-} catch (Exception $e) {
-    exit('Failed to add car: ' . $e->getMessage());
-}
-
+/* Start session */
 $_SESSION['name'] = $name;
 $_SESSION['password'] = $password;
 $_SESSION['username'] = $username;
