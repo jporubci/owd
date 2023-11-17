@@ -1,4 +1,10 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+if (!isset($_SESSION['username'])) {
+    header('Location: logout_user.php');
+}
 
 $phpFileUploadErrors = array(
     0 => 'There is no error, the file uploaded with success',
@@ -45,8 +51,8 @@ if (!$dbh) {
 }
 
 /* Validate user */
-$username = $_POST['username'];
-$password = $_POST['password'];
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 $VIN = $_POST['VIN'];
 
 /* Try to look up user */
@@ -118,15 +124,7 @@ try {
     /* Begin transaction */
     $dbh->beginTransaction();
     $dbh->exec('INSERT INTO Trips (VIN) VALUES (\'' . $VIN . '\')');
-    $trip_id = null;
-    foreach ($dbh->query('SELECT trip_id FROM Trips WHERE VIN=\'' . $VIN . '\'') as $row) {
-        if ($trip_id === null) {
-            $trip_id = $row['trip_id'];
-        } else {
-            $dbh->rollBack();
-            exit('Unexpected failure: trip_id not unique.');
-        }
-    }
+    $trip_id = $dbh->lastInsertId();
     
     if ($trip_id === null) {
         $dbh->rollBack();
@@ -147,6 +145,6 @@ try {
     exit('Failed to upload data: ' . $e->getMessage());
 }
 
-echo 'Upload success!';
+header('Location: home.php');
 
 ?>

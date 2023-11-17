@@ -1,4 +1,10 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+if (!isset($_SESSION['username'])) {
+    header('Location: logout_user.php');
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Invalid request method.');
@@ -28,8 +34,8 @@ if (!$dbh) {
 }
 
 /* Validate user */
-$username = $_POST['username'];
-$password = $_POST['password'];
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 $VIN = $_POST['VIN'];
 
 /* Try to look up user */
@@ -78,6 +84,6 @@ try {
     exit('Failed to add car: ' . $e->getMessage());
 }
 
-echo 'Car added successfully!';
+header('Location: home.php');
 
 ?>

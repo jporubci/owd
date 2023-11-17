@@ -2,12 +2,8 @@
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-if (isset($_SESSION['username'])) {
-    header('Location: home.php');
-}
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    exit('Invalid request method.');
+if (!isset($_SESSION['username'])) {
+    header('Location: logout_user.php');
 }
 
 /* Connect to MySQL DB */
@@ -34,38 +30,20 @@ if (!$dbh) {
 }
 
 /* Validate user */
-$username = $_POST['username'];
-$password = $_POST['password'];
-$name = $_POST['name'];
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 
-/* Try to look up user */
+/* Try to get cars */
+$cars = '';
 try {
-    /* Begin transaction */
-    $a = false;
-    foreach ($dbh->query('SELECT username FROM Users WHERE username=\'' . $username . '\'') as $row) {
-        $a = true;
+    foreach ($dbh->query('SELECT VIN, make, model, year FROM Users, Cars WHERE Users.username=Cars.username AND Users.username=\'' . $username . '\' AND Users.password=\'' . $password . '\'') as $row) {
+        $cars .= '<option value=\'' . $row['VIN'] . '\'>' . $row['year'] . ' ' . $row['make'] . ' ' . $row['model'] . ' - ' . $row['VIN'] . '</option>';
     }
-    
-    if ($a) {
-        exit('User already exists.');
-    }
-    
-} catch (Exception $e) {
-    exit('Failed to log in: ' . $e->getMessage());
-}
-
-/* Try to upload car */
-try {
-    $dbh->exec('INSERT INTO Users (username, password, name) VALUES (\'' . $username . '\', \'' . $password . '\', \'' . $name . '\')');
 
 } catch (Exception $e) {
-    exit('Failed to add car: ' . $e->getMessage());
+    exit('Failed to get cars: ' . $e->getMessage());
 }
 
-$_SESSION['name'] = $name;
-$_SESSION['password'] = $password;
-$_SESSION['username'] = $username;
-
-header('Location: home.php');
+$_SESSION['cars'] = $cars;
 
 ?>
